@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
 import './Login.scss'
 import { Button,Container,Row,Col,Form } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 const Login = () => {
+    let defaultInputRegister = {
+        isUserName:true,
+        isEmail:true,
+        isPhone:true,
+        isPassword:true,
+        isComfirm:true
+    }
     const [emailPhoneLogin, setEmailPhoneLogin] = useState("")
     const [passwordLogin, setPasswordLogin] = useState("")
     const [emailRegister, setEmailRegister] = useState("")
@@ -12,6 +20,8 @@ const Login = () => {
     const [comfirmRegister, setcomfirmRegister] = useState("")
     const [changeFromLogin, setChangeFromLogin] = useState(true)
     const [changeFromRegister, setChangeFromRegister] = useState(false)
+    const [objectCheckInputRegister, setObjectCheckInputRegister] = useState(defaultInputRegister)
+
     const clearInputLogin = () => {
         setEmailPhoneLogin("")
         setPasswordLogin("")
@@ -34,6 +44,49 @@ const Login = () => {
             clearInputRegister() 
         }
     }
+    const isValidInputRegister = () => {
+        setObjectCheckInputRegister(defaultInputRegister)
+        const regx = /\S+@\S+\.\S+/;
+
+        if(!userNameRegister){
+            toast.error("User name is required")
+            setObjectCheckInputRegister({...defaultInputRegister,isUserName:false})
+            return false
+        }
+
+        if(!emailRegister){
+            toast.error("Email is required")
+            setObjectCheckInputRegister({...defaultInputRegister,isEmail:false})
+            return false
+        }
+
+        if (!regx.test(emailRegister)){
+            toast.error("Please enter a valid email address")
+            setObjectCheckInputRegister({...defaultInputRegister,isEmail:false})
+            return false
+        }
+
+        if(!phoneRegister){
+            toast.error("Phone is required")
+            setObjectCheckInputRegister({...defaultInputRegister,isPhone:false})
+            return false
+        }
+
+        if(!passwordRegister){
+            toast.error("Password is required")
+            setObjectCheckInputRegister({...defaultInputRegister,isPassword:false})
+            return false
+        }  
+
+        if(passwordRegister != comfirmRegister){
+            toast.error("Your password is not the same")
+            setObjectCheckInputRegister({...defaultInputRegister,isComfirm:false})
+            return false
+        }  
+
+        return true;   
+    }
+
     const hanldLogin = () =>{
         const data = {
             emailPhoneLogin,
@@ -41,22 +94,31 @@ const Login = () => {
         }
         console.log(">>>> check data login:",data);
     }
-    const hanldRegister = () =>{
-        const data = {
-            username:userNameRegister,
-            email:emailRegister,
-            phone:phoneRegister,
-            password:passwordRegister
-        }
-        console.log(">>>> check data register:",data);
+
+
+    const postDataRegisterAxios = async (data) =>{
+        const api = await axios.post('http://localhost:8080/api/v1/register',data);
+        console.log(">>>>> check api:",api);
+        const req = await api.data; 
+        console.log(">>>>> check data:",req);
+        return req;
+    }   
+
+    const hanldRegister = async () =>{
+        const checkInputs = isValidInputRegister()
+        if(checkInputs){
+            const data = {
+                username:userNameRegister,
+                email:emailRegister,
+                phone:phoneRegister,
+                password:passwordRegister
+            }
+            const req = await postDataRegisterAxios(data);
+            console.log(">>>> check data register:",req);
+        } 
     }
 
-    //const getDataAxios = async () =>{
-        //const api = await axios.get('http://localhost:8080/api/v1');
-        //console.log(">>>>> check api:",api);
-        //const req = await api.data;
-       // console.log(">>>>> check data:",req);
-    //}    
+     
    // useEffect( () => {
        // getDataAxios();
    // },[])
@@ -89,19 +151,19 @@ const Login = () => {
                             </div>  
                             <div className='from-content-register' style={{display: changeFromRegister ? "": "none" }}>
                                 <Form.Group className="mb-3">
-                                <Form.Control type="text" placeholder="Your name" value={userNameRegister} onChange={(event) => setUserNameRegister(event.target.value)} />
+                                <Form.Control className={objectCheckInputRegister.isUserName ? "" : "is-invalid"} type="text" placeholder="Your name" value={userNameRegister} onChange={(event) => setUserNameRegister(event.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                <Form.Control type="email" placeholder="Your email" value={emailRegister} onChange={(event) => setEmailRegister(event.target.value)} />
+                                <Form.Control className={objectCheckInputRegister.isEmail ? "" : "is-invalid"} type="email" placeholder="Your email" value={emailRegister} onChange={(event) => setEmailRegister(event.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                <Form.Control type="text" placeholder="Your phone" value={phoneRegister} onChange={(event) => setPhoneRegister(event.target.value)} />
+                                <Form.Control className={objectCheckInputRegister.isPhone ? "" : "is-invalid"} type="text" placeholder="Your phone" value={phoneRegister} onChange={(event) => setPhoneRegister(event.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-3">
-                                <Form.Control type="password" placeholder="Your Password" value={passwordRegister} onChange={(event) => setpasswordRegister(event.target.value)}/>
+                                <Form.Control className={objectCheckInputRegister.isPassword ? "" : "is-invalid"} type="password" placeholder="Your Password" value={passwordRegister} onChange={(event) => setpasswordRegister(event.target.value)}/>
                                 </Form.Group>
                                 <Form.Group className="mb-5">
-                                <Form.Control type="password" placeholder="Re-enter Password" value={comfirmRegister} onChange={(event) => setcomfirmRegister(event.target.value)} />
+                                <Form.Control className={objectCheckInputRegister.isComfirm ? "" : "is-invalid"} type="password" placeholder="Re-enter Password" value={comfirmRegister} onChange={(event) => setcomfirmRegister(event.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-2">
                                 <Button variant="primary" className='btn-login' size='lg' onClick={hanldRegister}>Register</Button>
