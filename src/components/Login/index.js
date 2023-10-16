@@ -1,15 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './Login.scss'
 import { Button,Container,Row,Col,Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import { useHistory } from "react-router-dom";
+
+import { registerNewUser,loginUser } from '../../services/userService';
+
+
+
 const Login = () => {
+    const history = useHistory();
     let defaultInputRegister = {
         isUserName:true,
         isEmail:true,
         isPhone:true,
         isPassword:true,
         isComfirm:true
+    }
+    let defaultInputLogin = {
+        isEmailPhone:true, 
+        isPassword:true,
     }
     const [emailPhoneLogin, setEmailPhoneLogin] = useState("")
     const [passwordLogin, setPasswordLogin] = useState("")
@@ -21,7 +31,7 @@ const Login = () => {
     const [changeFromLogin, setChangeFromLogin] = useState(true)
     const [changeFromRegister, setChangeFromRegister] = useState(false)
     const [objectCheckInputRegister, setObjectCheckInputRegister] = useState(defaultInputRegister)
-
+    const [objectCheckInputLogin, setObjectCheckInputLogin] = useState(defaultInputLogin)
     const clearInputLogin = () => {
         setEmailPhoneLogin("")
         setPasswordLogin("")
@@ -78,7 +88,7 @@ const Login = () => {
             return false
         }  
 
-        if(passwordRegister != comfirmRegister){
+        if(passwordRegister !== comfirmRegister){
             toast.error("Your password is not the same")
             setObjectCheckInputRegister({...defaultInputRegister,isComfirm:false})
             return false
@@ -86,42 +96,55 @@ const Login = () => {
 
         return true;   
     }
+    const isValidInputLogin = () => {
+        setObjectCheckInputLogin(defaultInputLogin)
 
-    const hanldLogin = () =>{
-        const data = {
-            emailPhoneLogin,
-            password:passwordLogin
+        if(!emailPhoneLogin){
+            toast.error("Email or Phone is required")
+            setObjectCheckInputLogin({...defaultInputLogin,isEmailPhone:false})
+            return false
         }
-        console.log(">>>> check data login:",data);
+
+
+        if(!passwordLogin){
+            toast.error("Password is required")
+            setObjectCheckInputLogin({...defaultInputLogin,isPassword:false})
+            return false
+        }  
+
+        return true
+    }
+    const hanldLogin = async () =>{
+        const isCheckInputs = isValidInputLogin()
+        if(isCheckInputs){
+            const req = await loginUser(emailPhoneLogin,passwordLogin)
+            if(req && +req.EC === 0){
+                toast.success(req.EM)
+                history.push('/')
+            }else{
+                toast.error(req.EM)
+            }
+            console.log(">>>> check data login:",isCheckInputs);
+        }
     }
 
-
-    const postDataRegisterAxios = async (data) =>{
-        const api = await axios.post('http://localhost:8080/api/v1/register',data);
-        console.log(">>>>> check api:",api);
-        const req = await api.data; 
-        console.log(">>>>> check data:",req);
-        return req;
-    }   
 
     const hanldRegister = async () =>{
         const checkInputs = isValidInputRegister()
         if(checkInputs){
-            const data = {
-                username:userNameRegister,
-                email:emailRegister,
-                phone:phoneRegister,
-                password:passwordRegister
+            const req = await registerNewUser(userNameRegister,emailRegister,phoneRegister,passwordRegister);
+            if(req && +req.EC === 0){
+                toast.success(req.EM)
+                handlChangeFrom();
+            }else{
+                toast.error(req.EM)
             }
-            const req = await postDataRegisterAxios(data);
             console.log(">>>> check data register:",req);
         } 
     }
 
      
-   // useEffect( () => {
-       // getDataAxios();
-   // },[])
+   
 
     return (
         <div className='login-container'> 
@@ -137,10 +160,10 @@ const Login = () => {
                         <div className='content-right'>
                             <div className='from-content-login' style={{display: changeFromLogin? "": "none" }}>
                                 <Form.Group className="mb-3">
-                                <Form.Control type="email" placeholder="Your email" value={emailPhoneLogin} onChange={(event) => setEmailPhoneLogin(event.target.value)} />
+                                <Form.Control className={objectCheckInputLogin.isEmailPhone ? "" : "is-invalid"} type="email" placeholder="Your email or phone" value={emailPhoneLogin} onChange={(event) => setEmailPhoneLogin(event.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-5">
-                                <Form.Control type="password" placeholder="Your Password" value={passwordLogin} onChange={(event) => setPasswordLogin(event.target.value)} />
+                                <Form.Control className={objectCheckInputLogin.isPassword ? "" : "is-invalid"} type="password" placeholder="Your Password" value={passwordLogin} onChange={(event) => setPasswordLogin(event.target.value)} />
                                 </Form.Group>
                                 <Form.Group className="mb-2">
                                 <Button variant="primary" className='btn-login' size='lg' onClick={hanldLogin}>Login</Button>
