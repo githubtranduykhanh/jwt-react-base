@@ -9,6 +9,7 @@ import { registerNewUser,loginUser } from '../../services/userService';
 
 
 const Login = () => {
+
     const history = useHistory();
     let defaultInputRegister = {
         isUserName:true,
@@ -120,7 +121,12 @@ const Login = () => {
             const req = await loginUser(emailPhoneLogin,passwordLogin)
             if(req && +req.EC === 0){
                 toast.success(req.EM)
-                history.push('/')
+                const data = {
+                    isAuthenticated: true,
+                    token: 'fake token'
+                }
+                sessionStorage.setItem('account',JSON.stringify(data))
+                history.push('/user')
             }else{
                 toast.error(req.EM)
             }

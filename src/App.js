@@ -7,24 +7,25 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import Nav from './components/Navigation';
+
 import Home from './components/Home';
 import User from './components/User';
 import Login from './components/Login';
 
+import NavUser from './layouts/NavUser';
+
 function App() {
+
   return (
     
     <div className='app-contaner'>
-      
       <BrowserRouter>
-        <Nav/>
         <Switch>
           <Route exact path="/">
-            <Home/>
+            <NavUser><Home/></NavUser>
           </Route>
           <Route path="/user">
-            <User />
+            <NavUser><User/></NavUser>
           </Route>
           <Route path="/login">
             <Login/>
