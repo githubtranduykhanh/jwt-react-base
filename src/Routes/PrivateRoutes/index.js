@@ -1,15 +1,24 @@
 import { listPrivateRoutes } from ".."
 import {Route} from "react-router-dom";
-import NavUser from "../../layouts/NavUser";
+import { Fragment } from "react";
+import IsPrivate from "./IsPrivate";
+import { Switch } from "react-router-dom/cjs/react-router-dom.min";
 const PrivateRoutes = () => {
+
     return (
-        <>
-           {listPrivateRoutes && listPrivateRoutes.map((item,index) => 
-                !item.layout
-                ?<Route key={index} path={item.path} component={item.component}></Route>
-                :<Route key={index} path={item.path}><NavUser>{item.component}</NavUser></Route>         
-           )}
-        </>
+        <Switch>
+           {listPrivateRoutes.map((route,index) => {
+                const Component = route.component;
+                let Layouts = Fragment;
+                if(route.layout){
+                    Layouts = route.layout
+                }else if(route.layout === null){
+                    Layouts = Fragment
+                }              
+                return (<IsPrivate key={index} exact={route.exact} path={route.path} Component={Component} Layouts={Layouts}/>)
+            })}
+           
+        </Switch>
     )
 }
 

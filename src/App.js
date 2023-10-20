@@ -13,6 +13,10 @@ import User from './components/User';
 import Login from './components/Login';
 
 import NavUser from './layouts/NavUser';
+import { Fragment } from 'react';
+import PublicRoutes from './Routes/PublicRoutes';
+import PrivateRoutes from './Routes/PrivateRoutes';
+import IsPrivate from './Routes/PrivateRoutes/IsPrivate';
 
 function App() {
 
@@ -20,20 +24,11 @@ function App() {
     
     <div className='app-contaner'>
       <BrowserRouter>
-        <Switch>
-          <Route exact path="/">
-            <NavUser><Home/></NavUser>
-          </Route>
-          <Route path="/user">
-            <NavUser><User/></NavUser>
-          </Route>
-          <Route path="/login">
-            <Login/>
-          </Route>
-          <Route path="*">
-            404 Not Found
-          </Route>
-        </Switch>
+        
+        <PublicRoutes/>
+        <PrivateRoutes/>
+       
+        
         <ToastContainer
         position="top-right"
         autoClose={5000}
