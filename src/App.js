@@ -24,9 +24,9 @@ function App() {
     
     <div className='app-contaner'>
       <BrowserRouter>
-        
+        <PrivateRoutes/> 
         <PublicRoutes/>
-        <PrivateRoutes/>
+        
        
         
         <ToastContainer

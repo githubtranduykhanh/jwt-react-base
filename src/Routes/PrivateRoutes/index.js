@@ -1,5 +1,4 @@
 import { listPrivateRoutes } from ".."
-import {Route} from "react-router-dom";
 import { Fragment } from "react";
 import IsPrivate from "./IsPrivate";
 import { Switch } from "react-router-dom/cjs/react-router-dom.min";
@@ -7,7 +6,7 @@ const PrivateRoutes = () => {
 
     return (
         <Switch>
-           {listPrivateRoutes.map((route,index) => {
+           {listPrivateRoutes && listPrivateRoutes.map((route,index) => {
                 const Component = route.component;
                 let Layouts = Fragment;
                 if(route.layout){

@@ -8,7 +8,7 @@ const IsPrivate = ({path,exact,Component,Layouts}) => {
         if(!session){
             history.push('/login')
         }
-    },[])
+    },[history])
 
     return (     
         <Route path={path} exact={exact} ><Layouts><Component/></Layouts></Route>
