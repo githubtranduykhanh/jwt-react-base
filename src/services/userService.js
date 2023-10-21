@@ -12,5 +12,14 @@ export const loginUser = async (emailPhone, password) =>{
 
 
 export const listTableUser = async () => {
-    return (await axios.get('http://localhost:8080/api/v1/user')).data;
+    return (await axios.get('http://localhost:8080/api/v1/user/read')).data;
+}
+
+export const listTableUserPageLimit = async (page,limit) => {
+    return (await axios.get(`http://localhost:8080/api/v1/user/read?page=${page}&limit=${limit}`)).data;
+}
+
+
+export const deteteUser = async (id) => {
+    return (await axios.delete('http://localhost:8080/api/v1/user/delete',{ data:{ id } })).data;
 }
